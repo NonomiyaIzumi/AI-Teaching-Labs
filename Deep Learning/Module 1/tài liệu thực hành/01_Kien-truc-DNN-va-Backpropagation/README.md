@@ -1,60 +1,95 @@
-# Bài 01 — Xây dựng mô hình DNN (Kiến trúc & Backpropagation)
+# LAB 01 - Hướng dẫn tự thực hành
+
+## Xây dựng mô hình DNN (Kiến trúc & Backpropagation)
 
 **Notebook tương ứng:** `thực hành/01_Kien-truc-DNN-va-Backpropagation/01_Xay_dung_mo_hinh_DNN.ipynb`
 
-## 1. Mục tiêu
+## 1. Phát biểu bài toán
 
-Bài này thực hành phần nội dung: *Nguyên lý và kiến trúc của DNN/MLP*, *Backpropagation và các hàm kích hoạt*.
+Cài đặt từ đầu (chỉ dùng NumPy, không dùng framework) toàn bộ các khối xây dựng của một mạng DNN L lớp: khởi tạo tham số, forward propagation, hàm mất mát, backward propagation và cập nhật tham số — để dùng làm nền tảng cho mọi bài sau trong Module 1.
 
-Sau khi hoàn thành, học viên có thể:
-- Tự cài đặt forward propagation và backward propagation cho một mạng DNN L lớp bất kỳ, hoàn toàn bằng NumPy (không dùng framework).
-- Hiểu rõ luồng dữ liệu: `LINEAR -> ACTIVATION` lặp lại qua từng lớp, và cách gradient lan truyền ngược qua từng lớp bằng chain rule.
-- Phân biệt vai trò của ReLU (hidden layers) và Sigmoid (output layer) trong bài toán phân loại nhị phân.
+| Thành phần | Mô tả yêu cầu |
+|---|---|
+| Input | Vector/ma trận đặc trưng `X`, shape `(n_x, m)` — `n_x` số đặc trưng, `m` số vi dụ. Trong bài này, `X` chỉ là các mảng số cố định lấy từ `testCases.py` để kiểm thử hàm, chưa phải dữ liệu ảnh thật. |
+| Output | Với mỗi hàm: giá trị/dictionary tương ứng (`parameters`, `AL`, `cost`, `grads`...) — không có "nhãn dự đoán" theo nghĩa một bài toán train hoàn chỉnh, vì bài này dừng ở mức xây dựng function, chưa train trên dataset thật. |
+| Loại bài toán | Cài đặt thuật toán (forward/backward propagation) cho mạng nơ-ron L lớp tổng quát; kiểm thử bằng unit test có sẵn (`testCases.py`, `public_tests.py`). |
+| Mục tiêu nâng cao | Không chỉ chép công thức — phải tự suy luận đúng shape của từng ma trận `W^[l]`, `b^[l]`, `Z^[l]`, `A^[l]` ở mỗi bước, vì đây là nguyên nhân phổ biến nhất gây lỗi khi mở rộng mạng lên nhiều lớp. |
+| Metric chính | Không có metric huấn luyện (chưa train) — "đúng/sai" được xác định qua so khớp với **expected output** in sẵn trong notebook và qua các cell `..._test(...)`. |
 
-## 2. Chuẩn bị
+> **Điểm khác với các bài dùng framework (PyTorch):** Ở đây không có `nn.Linear`, không có autograd — mọi phép nhân ma trận, mọi đạo hàm đều tự viết tay bằng NumPy. Vì vậy sai một dấu `.T`, một `axis`, hay quên `keepdims=True` là lỗi thường gặp nhất; đọc kỹ shape ghi trong docstring trước khi code.
 
-- Đại số tuyến tính cơ bản (nhân ma trận, chuyển vị).
-- Đạo hàm/chain rule.
-- NumPy cơ bản (`np.dot`, broadcasting, `shape`).
+## 2. Dữ liệu sử dụng
 
-## 3. Cách mở và chạy trên Google Colab
+Bài này **không dùng dataset thật**. Toàn bộ input để kiểm thử hàm được sinh sẵn trong `testCases.py` (mảng số cố định, không phải ảnh/văn bản), và `public_tests.py` chứa các test case đối chiếu kết quả — dùng chung logic với `test_utils.py` (không phụ thuộc gói `dlai_tools` nội bộ của Coursera, nên chạy được bình thường ngoài môi trường Coursera).
 
-1. Trong Google Drive, vào đúng thư mục `Deep Learning/Module 1/thực hành/01_Kien-truc-DNN-va-Backpropagation/`.
-2. Chuột phải vào file `.ipynb` → **Open with → Google Colaboratory**.
-3. Chạy cell đầu tiên (Colab setup) — cell này tự mount Google Drive và `cd` vào đúng thư mục để các lệnh `from dnn_utils import ...`, `from testCases import ...` và ảnh minh họa trong `images/` hoạt động đúng.
-   - **Quan trọng:** nếu đường dẫn trong cell (`NOTEBOOK_DIR`) không khớp với vị trí thực tế bạn lưu trên Drive, hãy sửa lại cho đúng trước khi chạy tiếp.
-4. Chạy tuần tự từng cell từ trên xuống (Runtime → Run all, hoặc Shift+Enter từng cell).
+| Thuộc tính | Giá trị cần kiểm tra trong notebook |
+|---|---|
+| Nguồn input test | `testCases.py` (cùng thư mục với notebook) |
+| Shape test case — mạng 2 lớp | `initialize_parameters(n_x=3, n_h=2, n_y=1)` |
+| Shape test case — mạng L lớp | `initialize_parameters_deep([5, 4, 3])` (2 lớp: 5→4→3) |
+| Framework chấm điểm | `public_tests.py` + `test_utils.py` (tự chứa, không cần cài thêm gói ngoài) |
 
-## 4. Nội dung chính (10 Exercise)
+## 3. Output bắt buộc của bài thực hành
 
-| Mục | Exercise | Nội dung |
-|---|---|---|
-| 3.1 | Exercise 1 | `initialize_parameters` — khởi tạo W, b cho mạng 2 lớp |
-| 3.2 | Exercise 2 | `initialize_parameters_deep` — khởi tạo cho mạng L lớp tổng quát |
-| 4.1 | Exercise 3 | `linear_forward` — tính $Z = WA + b$ |
-| 4.2 | Exercise 4 | `linear_activation_forward` — Linear + ReLU/Sigmoid |
-| 4.3 | Exercise 5 | `L_model_forward` — ghép toàn bộ forward pass L lớp |
-| 5 | Exercise 6 | `compute_cost` — cross-entropy loss |
-| 6.1 | Exercise 7 | `linear_backward` — dW, db, dA_prev từ dZ |
-| 6.2 | Exercise 8 | `linear_activation_backward` — backward qua ReLU/Sigmoid |
-| 6.3 | Exercise 9 | `L_model_backward` — ghép toàn bộ backward pass |
-| 6.4 | Exercise 10 | `update_parameters` — cập nhật W, b bằng gradient descent |
+Notebook nộp bài cần chạy được tuần tự từ cell đầu đến cell cuối, mọi cell test đều phải **pass** (không có `AssertionError`).
 
-Mỗi exercise đều có test cell riêng (dùng `testCases.py`/`public_tests.py`) để tự kiểm tra kết quả trước khi qua bước tiếp theo.
+| Nhóm output | Yêu cầu cụ thể |
+|---|---|
+| Khởi tạo tham số | In `W1, b1, W2, b2` (mạng 2 lớp) và `W1, b1, W2, b2` (mạng L lớp, ví dụ `[5,4,3]`) đúng shape, khớp expected output |
+| Forward propagation | `linear_forward`, `linear_activation_forward`, `L_model_forward` chạy đúng, `AL` có shape `(1, m)`, giá trị nằm trong `(0,1)` (do Sigmoid ở lớp cuối) |
+| Cost | `compute_cost` trả về một số vô hướng (scalar), không phải mảng |
+| Backward propagation | `linear_backward`, `linear_activation_backward`, `L_model_backward` trả đúng `dW`, `db`, `dA_prev` khớp expected output |
+| Cập nhật tham số | `update_parameters` trả về `parameters` đã cập nhật đúng công thức `W := W - learning_rate * dW` |
+| Toàn bộ 10 test cell | Mỗi test cell (`..._test(...)`) in ra kết quả **pass**, không có exception |
 
-## 5. Kết quả mong đợi
+## 4. Cấu hình thí nghiệm khuyến nghị
 
-- Toàn bộ 10 test cell chạy không lỗi, in ra kết quả khớp expected output ghi sẵn trong notebook.
-- Đây là notebook nền tảng — các bài 02–05 đều tái sử dụng đúng công thức forward/backward đã cài ở đây (chỉ thay đổi cách khởi tạo, thêm normalization, hoặc thay optimizer).
+Bài này không "train" nên không có learning rate/epoch — cấu hình dưới đây là các **shape chuẩn** dùng để tự kiểm tra (đã khớp sẵn trong notebook, không cần đổi khi chạy bản chính):
 
-## 6. Câu hỏi ôn tập / mở rộng
+| Thành phần | Cấu hình khuyến nghị |
+|---|---|
+| Kiến trúc test — 2 lớp | `n_x=3, n_h=2, n_y=1` |
+| Kiến trúc test — L lớp | `layers_dims = [5, 4, 3]` |
+| Activation hidden layer | ReLU |
+| Activation output layer | Sigmoid |
+| Learning rate dùng trong `update_parameters` (test case) | `0.1` |
 
-1. Vì sao lớp output dùng Sigmoid thay vì ReLU trong bài toán phân loại nhị phân?
-2. Nếu bỏ activation ở hidden layer (dùng linear thuần), mạng L lớp có còn mạnh hơn 1 lớp logistic regression không? Vì sao?
-3. `linear_backward` cần những giá trị nào từ forward pass (cache) để tính được dW, db, dA_prev?
+## 5. Quy trình thực hiện từng bước
 
-## 7. Lưu ý khi kiểm tra bài trước khi nộp
+1. **Import & kiểm tra môi trường:** import `numpy`, `matplotlib`, `h5py`, `testCases`, `public_tests`, `dnn_utils` (`sigmoid`, `relu` và đạo hàm của chúng).
+2. **Đọc lại kiến trúc tổng quát (mục 2 - Outline):** hiểu sơ đồ `LINEAR -> RELU` lặp lại `L-1` lần rồi `LINEAR -> SIGMOID` ở lớp cuối, và quy ước ký hiệu `[l]` (layer), `(i)` (example).
+3. **Exercise 1 - `initialize_parameters`:** khởi tạo `W1, b1, W2, b2` cho mạng 2 lớp — `W` khởi tạo ngẫu nhiên nhỏ (`*0.01`), `b` khởi tạo 0.
+4. **Exercise 2 - `initialize_parameters_deep`:** tổng quát hoá Exercise 1 cho `layers_dims` bất kỳ độ dài, dùng vòng lặp `for l in range(1, L)`.
+5. **Exercise 3 - `linear_forward`:** tính `Z = np.dot(W, A) + b`, trả về `Z` và `cache = (A, W, b)`.
+6. **Exercise 4 - `linear_activation_forward`:** gọi `linear_forward` rồi áp activation (`sigmoid` hoặc `relu`), lưu cả `linear_cache` và `activation_cache`.
+7. **Exercise 5 - `L_model_forward`:** lặp `linear_activation_forward` với ReLU cho `L-1` lớp đầu, Sigmoid cho lớp cuối; trả về `AL` và danh sách `caches`.
+8. **Exercise 6 - `compute_cost`:** cross-entropy loss `-1/m * sum(Y*log(AL) + (1-Y)*log(1-AL))`.
+9. **Exercise 7 - `linear_backward`:** từ `dZ` và `cache`, tính `dW = 1/m * dZ.A_prev^T`, `db = 1/m * sum(dZ)`, `dA_prev = W^T.dZ`.
+10. **Exercise 8 - `linear_activation_backward`:** áp `sigmoid_backward`/`relu_backward` lên `dA` để ra `dZ`, rồi gọi `linear_backward`.
+11. **Exercise 9 - `L_model_backward`:** khởi tạo `dAL` từ đạo hàm cross-entropy, lan truyền ngược qua Sigmoid (lớp cuối) rồi qua từng ReLU layer theo thứ tự ngược.
+12. **Exercise 10 - `update_parameters`:** cập nhật toàn bộ `W^[l]`, `b^[l]` bằng gradient descent với `learning_rate`.
 
-- Chạy lại **toàn bộ notebook từ đầu** (Runtime → Restart and run all) trên chính Colab, không chỉ chạy rời rạc từng cell — để đảm bảo không có biến "ẩn" từ lần chạy trước gây lỗi khi chấm.
-- Dữ liệu dùng trong bài này chỉ là `testCases.py` (mảng số cố định, không phải dữ liệu thật) nên không có rủi ro data leakage.
-- Sau khi chạy sạch, không lỗi, báo lại cho anh Cường / thầy Thiện theo đúng quy trình đã hướng dẫn.
+## 6. Kết quả mong đợi
+
+- Toàn bộ 10 test cell chạy không lỗi, giá trị in ra khớp **Expected Output** ghi ngay dưới mỗi bài tập trong notebook.
+- Đây là "thư viện hàm" nền tảng — các bài 02–05 trong Module 1 đều tái sử dụng đúng công thức forward/backward đã kiểm chứng ở đây (chỉ thay cách khởi tạo, thêm normalization, hoặc đổi thuật toán cập nhật tham số).
+
+## 7. Bài tập mở rộng
+
+1. **Tự vẽ sơ đồ shape:** với `layers_dims = [4, 3, 2, 1]`, viết ra giấy shape của từng `W^[l]`, `b^[l]`, `Z^[l]`, `A^[l]` trước khi chạy code — rồi in shape thật trong notebook (`.shape`) để đối chiếu.
+2. **Thêm activation Tanh:** cài thêm nhánh `tanh` trong `linear_activation_forward`/`backward` (dùng `np.tanh` và đạo hàm `1 - tanh(z)^2`), so sánh kết quả `AL` với bản ReLU trên cùng test case.
+3. **Gộp forward+backward thành một hàm `L_layer_train_step`:** nhận `X, Y, parameters, layers_dims`, gọi lần lượt forward → cost → backward → update, trả về `parameters` mới và `cost` — đây chính là bước đệm để hiểu vòng lặp huấn luyện đầy đủ sẽ dùng ở bài 03/04.
+
+## 8. Tài liệu bổ sung
+
+| Chủ đề | Liên kết tham khảo |
+|---|---|
+| NumPy broadcasting (nguồn lỗi shape phổ biến nhất) | https://numpy.org/doc/stable/user/basics.broadcasting.html |
+| Cross-entropy loss cho phân loại nhị phân | https://en.wikipedia.org/wiki/Cross-entropy |
+| Backpropagation (bài giảng gốc deeplearning.ai) | https://www.coursera.org/learn/neural-networks-deep-learning |
+
+## 9. Lưu ý khi kiểm tra bài trước khi nộp
+
+- Chạy lại **toàn bộ notebook từ đầu** trên Colab (Runtime → Restart and run all), không chỉ chạy rời rạc từng cell.
+- Dữ liệu chỉ là mảng số cố định trong `testCases.py`, không phải dữ liệu thật → không có rủi ro data leakage.
+- Sau khi chạy sạch không lỗi, báo lại cho anh Cường / thầy Thiện theo đúng quy trình đã hướng dẫn.
