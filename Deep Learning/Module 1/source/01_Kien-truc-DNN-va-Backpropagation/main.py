@@ -17,6 +17,7 @@ from model import (
     linear_forward,
     update_parameters,
 )
+from utils import load_dataset
 from public_tests import (
     L_model_backward_test,
     L_model_forward_test,
@@ -143,6 +144,42 @@ def main():
     update_parameters_test(update_parameters)
 
     print("\nHoan tat: toan bo 10 exercise da chay va pass test.")
+
+    print("\n=== [Bonus] Ap dung vao du lieu that (Pima Indians Diabetes) ===")
+    train_X, train_Y, test_X, test_Y = load_dataset()
+    print("train_X:", train_X.shape, " train_Y:", train_Y.shape)
+    print("test_X: ", test_X.shape, " test_Y: ", test_Y.shape)
+
+    layers_dims = [train_X.shape[0], 7, 1]
+    parameters, costs = L_layer_model(train_X, train_Y, layers_dims, learning_rate=0.5, num_iterations=3000)
+
+    print("\nTrain accuracy:", predict_accuracy(train_X, train_Y, parameters))
+    print("Test accuracy: ", predict_accuracy(test_X, test_Y, parameters))
+
+
+def L_layer_model(X, Y, layers_dims, learning_rate=0.5, num_iterations=3000, print_cost=True):
+    """Huan luyen mang DNN L lop bang chinh cac ham da xay o 10 exercise phia tren."""
+    np.random.seed(1)
+    costs = []
+    parameters = initialize_parameters_deep(layers_dims)
+
+    for i in range(num_iterations):
+        AL, caches = L_model_forward(X, parameters)
+        cost = compute_cost(AL, Y)
+        grads = L_model_backward(AL, Y, caches)
+        parameters = update_parameters(parameters, grads, learning_rate)
+
+        if print_cost and i % 500 == 0:
+            print("Cost after iteration {}: {}".format(i, float(np.squeeze(cost))))
+            costs.append(cost)
+
+    return parameters, costs
+
+
+def predict_accuracy(X, Y, parameters):
+    AL, _ = L_model_forward(X, parameters)
+    predictions = (AL > 0.5).astype(int)
+    return np.mean(predictions == Y)
 
 
 if __name__ == "__main__":

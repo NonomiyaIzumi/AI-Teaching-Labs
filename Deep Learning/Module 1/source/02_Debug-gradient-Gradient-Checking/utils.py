@@ -3,6 +3,41 @@ Cac ham duoc cung cap san (khong phai bai tap) - port tu gc_utils.py trong ban n
 """
 
 import numpy as np
+import sklearn.model_selection
+
+
+def load_dataset(csv_path="../../data/pima-indians-diabetes.csv", test_size=0.2, seed=1):
+    """
+    [Bonus] Bo du lieu Pima Indians Diabetes (768 benh nhan, 8 dac trung lam sang, du doan
+    tieu duong) - dung de kiem tra gradient_check_n tren du lieu that thay vi chi tren
+    tham so gia lap co dinh trong gradient_check_n_test_case().
+    """
+    raw = np.genfromtxt(csv_path, delimiter=",", skip_header=1)
+    X = raw[:, :8]
+    y = raw[:, 8]
+
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
+        X, y, test_size=test_size, random_state=seed, stratify=y
+    )
+    X_train = X_train.copy()
+    X_test = X_test.copy()
+
+    zero_as_missing_cols = [1, 2, 3, 4, 5]  # Glucose, BloodPressure, SkinThickness, Insulin, BMI
+    for c in zero_as_missing_cols:
+        col = X_train[:, c]
+        median = np.median(col[col != 0])
+        X_train[X_train[:, c] == 0, c] = median
+        X_test[X_test[:, c] == 0, c] = median
+
+    mu = X_train.mean(axis=0)
+    sigma = X_train.std(axis=0)
+    X_train = (X_train - mu) / sigma
+    X_test = (X_test - mu) / sigma
+
+    train_X, test_X = X_train.T, X_test.T
+    train_Y = y_train.reshape(1, -1)
+    test_Y = y_test.reshape(1, -1)
+    return train_X, train_Y, test_X, test_Y
 
 
 def sigmoid(x):
@@ -15,11 +50,21 @@ def relu(x):
     return np.maximum(0, x)
 
 
+# Duoc dictionary_to_vector() ghi lai moi lan goi, de vector_to_dictionary() biet cach
+# khoi phuc dung shape ma khong can hard-code rieng cho kien truc W1:(5,4),b1:(5,1),...
+# cua bai tap goc - nho vay 2 ham nay dung duoc voi BAT KY kien truc mang nao (vd bonus
+# ap dung gradient checking cho mang train tren du lieu that o cuoi bai), khong doi API.
+_last_shapes = {}
+
+
 def dictionary_to_vector(parameters):
     """Roll all our parameters dictionary into a single vector satisfying our specific required shape."""
+    global _last_shapes
     keys = []
     count = 0
-    for key in ["W1", "b1", "W2", "b2", "W3", "b3"]:
+    _last_shapes = {}
+    for key in parameters.keys():
+        _last_shapes[key] = parameters[key].shape
         new_vector = np.reshape(parameters[key], (-1, 1))
         keys = keys + [key] * new_vector.shape[0]
         if count == 0:
@@ -31,14 +76,17 @@ def dictionary_to_vector(parameters):
 
 
 def vector_to_dictionary(theta):
-    """Unroll all our parameters dictionary from a single vector satisfying our specific required shape."""
+    """
+    Unroll all our parameters dictionary from a single vector satisfying our specific required shape.
+    Dung shape ghi lai boi lan goi dictionary_to_vector() gan nhat - luon goi dictionary_to_vector()
+    truoc khi dung ham nay (dung nhu gradient_check_n() da lam).
+    """
     parameters = {}
-    parameters["W1"] = theta[:20].reshape((5, 4))
-    parameters["b1"] = theta[20:25].reshape((5, 1))
-    parameters["W2"] = theta[25:40].reshape((3, 5))
-    parameters["b2"] = theta[40:43].reshape((3, 1))
-    parameters["W3"] = theta[43:46].reshape((1, 3))
-    parameters["b3"] = theta[46:47].reshape((1, 1))
+    idx = 0
+    for key, shape in _last_shapes.items():
+        size = int(np.prod(shape))
+        parameters[key] = theta[idx : idx + size].reshape(shape)
+        idx += size
     return parameters
 
 

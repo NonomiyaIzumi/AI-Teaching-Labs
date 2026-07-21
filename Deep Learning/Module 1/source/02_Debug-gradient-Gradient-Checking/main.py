@@ -13,6 +13,7 @@ from model import (
     gradient_check_n,
 )
 from test_cases import gradient_check_n_test_case
+from utils import load_dataset
 
 
 def main():
@@ -42,6 +43,26 @@ def main():
     assert np.any(np.isclose(difference, expected_values)), "Wrong value. It is not one of the expected values"
 
     print("\nHoan tat: gradient_check_n da phat hien dung bug trong backward_propagation_n (nhu thiet ke).")
+
+    print("\n=== [Bonus] Gradient checking tren du lieu that (Pima Indians Diabetes) ===")
+    train_X, train_Y, test_X, test_Y = load_dataset()
+
+    np.random.seed(1)
+    batch_idx = np.random.choice(train_X.shape[1], size=16, replace=False)
+    X_real = train_X[:, batch_idx]
+    Y_real = train_Y[:, batch_idx]
+    print("X_real:", X_real.shape, " Y_real:", Y_real.shape)
+
+    np.random.seed(3)
+    layers_dims_real = [8, 5, 3, 1]
+    parameters_real = {}
+    for l in range(1, len(layers_dims_real)):
+        parameters_real[f"W{l}"] = np.random.randn(layers_dims_real[l], layers_dims_real[l - 1]) * 0.1
+        parameters_real[f"b{l}"] = np.zeros((layers_dims_real[l], 1))
+
+    cost_real, cache_real = forward_propagation_n(X_real, Y_real, parameters_real)
+    gradients_real = backward_propagation_n(X_real, Y_real, cache_real)
+    gradient_check_n(parameters_real, gradients_real, X_real, Y_real, 1e-7, True)
 
 
 if __name__ == "__main__":

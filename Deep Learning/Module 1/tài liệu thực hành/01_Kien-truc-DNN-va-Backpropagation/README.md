@@ -78,22 +78,37 @@ Bài này không "train" nên không có learning rate/epoch — cấu hình dư
 - Toàn bộ 10 test cell chạy không lỗi, giá trị in ra khớp **Expected Output** ghi ngay dưới mỗi bài tập trong notebook.
 - Đây là "thư viện hàm" nền tảng — các bài 02–05 trong Module 1 đều tái sử dụng đúng công thức forward/backward đã kiểm chứng ở đây (chỉ thay cách khởi tạo, thêm normalization, hoặc đổi thuật toán cập nhật tham số).
 
-## 7. Bài tập mở rộng
+## 7. [Bonus] Áp dụng vào dữ liệu thật
+
+Notebook có thêm mục **"11. [Bonus] Áp dụng vào dữ liệu thật"** ở cuối (sau cell "Congratulations!") — dùng chính các hàm vừa cài (`initialize_parameters_deep`, `L_model_forward`, `compute_cost`, `L_model_backward`, `update_parameters`) để lắp thành một hàm huấn luyện đầy đủ `L_layer_model(X, Y, layers_dims, learning_rate, num_iterations, print_cost)`, rồi train trên bộ dữ liệu y tế thật **Pima Indians Diabetes** (768 bệnh nhân, 8 đặc trưng lâm sàng, dự đoán tiểu đường) qua `load_dataset()` — cùng bộ dữ liệu và cách tiền xử lý sẽ dùng lại xuyên suốt các bài 03–05.
+
+| Thành phần | Giá trị |
+|---|---|
+| Kiến trúc | `layers_dims = [train_X.shape[0], 7, 1] = [8, 7, 1]` (1 hidden layer) |
+| Learning rate | `0.5` |
+| Số iteration | `3000` |
+| Kết quả | Train accuracy ≈ **83.1%**, Test accuracy ≈ **74.0%** |
+
+Đây chỉ là bản demo đơn giản (1 hidden layer, khởi tạo `*0.01` mặc định) — thử tăng lên mạng sâu hơn (vd `[8, 20, 7, 5, 1]`) sẽ thấy accuracy tụt lại ngang baseline (~65%, tức đoán toàn bộ về lớp đa số) do vanishing gradient với cách khởi tạo ngây thơ này. Đây chính là vấn đề mà **bài 03** sẽ giải quyết bằng khởi tạo He/Xavier.
+
+## 8. Bài tập mở rộng
 
 1. **Tự vẽ sơ đồ shape:** với `layers_dims = [4, 3, 2, 1]`, viết ra giấy shape của từng `W^[l]`, `b^[l]`, `Z^[l]`, `A^[l]` trước khi chạy code — rồi in shape thật trong notebook (`.shape`) để đối chiếu.
 2. **Thêm activation Tanh:** cài thêm nhánh `tanh` trong `linear_activation_forward`/`backward` (dùng `np.tanh` và đạo hàm `1 - tanh(z)^2`), so sánh kết quả `AL` với bản ReLU trên cùng test case.
 3. **Gộp forward+backward thành một hàm `L_layer_train_step`:** nhận `X, Y, parameters, layers_dims`, gọi lần lượt forward → cost → backward → update, trả về `parameters` mới và `cost` — đây chính là bước đệm để hiểu vòng lặp huấn luyện đầy đủ sẽ dùng ở bài 03/04.
+4. **Kiểm chứng nhận định "mạng sâu hơn sẽ tệ hơn":** tự thử `layers_dims = [8, 20, 7, 5, 1]` trong mục Bonus với nhiều learning rate khác nhau (0.01 đến 0.75), xác nhận accuracy không vượt qua baseline — rồi so sánh với kết quả sau khi áp dụng He initialization ở bài 03.
 
-## 8. Tài liệu bổ sung
+## 9. Tài liệu bổ sung
 
 | Chủ đề | Liên kết tham khảo |
 |---|---|
 | NumPy broadcasting (nguồn lỗi shape phổ biến nhất) | https://numpy.org/doc/stable/user/basics.broadcasting.html |
 | Cross-entropy loss cho phân loại nhị phân | https://en.wikipedia.org/wiki/Cross-entropy |
 | Backpropagation (bài giảng gốc deeplearning.ai) | https://www.coursera.org/learn/neural-networks-deep-learning |
+| Pima Indians Diabetes Dataset (nguồn gốc) | https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database |
 
-## 9. Lưu ý khi kiểm tra bài trước khi nộp
+## 10. Lưu ý khi kiểm tra bài trước khi nộp
 
 - Chạy lại **toàn bộ notebook từ đầu** trên Colab (Runtime → Restart and run all), không chỉ chạy rời rạc từng cell.
-- Dữ liệu chỉ là mảng số cố định trong `testCases.py`, không phải dữ liệu thật → không có rủi ro data leakage.
+- Dữ liệu chính chỉ là mảng số cố định trong `testCases.py`, không phải dữ liệu thật → không có rủi ro data leakage. Riêng mục Bonus (mục 7) dùng dữ liệu Pima Diabetes thật với train/test tách rõ trong `load_dataset()`.
 - Sau khi chạy sạch không lỗi, báo lại cho anh Cường / thầy Thiện theo đúng quy trình đã hướng dẫn.

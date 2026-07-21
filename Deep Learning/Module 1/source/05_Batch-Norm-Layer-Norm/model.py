@@ -235,7 +235,30 @@ def model(X, Y, layers_dims, norm_type="none", init_type="random_bad", learning_
     return parameters, bn_states, costs, grad_norms, tracked_iters
 
 
-def predict_dec(X, parameters, layers_dims, norm_type, bn_states):
-    """Du doan nhi phan (nguong 0.5) dung cho ve decision boundary, dung mode='test'."""
+def evaluate_classification(X, y, parameters, layers_dims, norm_type, bn_states, title):
+    """
+    Du doan tren (X, y), in Accuracy/Precision/Recall/F1/AUC va tra ve confusion matrix + ROC data.
+    Thay cho decision boundary 2D (khong con ve duoc voi du lieu nhieu chieu nhu Pima Diabetes).
+    """
+    import sklearn.metrics
+
     AL, _ = forward_propagation(X, parameters, layers_dims, norm_type, bn_states, mode="test")
-    return AL > 0.5
+    y_true = y.ravel().astype(int)
+    y_prob = AL.ravel()
+    y_pred = (y_prob > 0.5).astype(int)
+
+    acc = (y_pred == y_true).mean()
+    prec = sklearn.metrics.precision_score(y_true, y_pred, zero_division=0)
+    rec = sklearn.metrics.recall_score(y_true, y_pred, zero_division=0)
+    f1 = sklearn.metrics.f1_score(y_true, y_pred, zero_division=0)
+    cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
+    fpr, tpr, _ = sklearn.metrics.roc_curve(y_true, y_prob)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+
+    print(title)
+    print(f"  Accuracy:  {acc:.4f}")
+    print(f"  Precision: {prec:.4f}")
+    print(f"  Recall:    {rec:.4f}")
+    print(f"  F1-score:  {f1:.4f}")
+    print(f"  AUC:       {roc_auc:.4f}")
+    return {"accuracy": acc, "precision": prec, "recall": rec, "f1": f1, "auc": roc_auc, "cm": cm, "fpr": fpr, "tpr": tpr}

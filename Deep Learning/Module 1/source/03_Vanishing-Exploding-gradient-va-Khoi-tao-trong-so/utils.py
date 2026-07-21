@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sklearn
 import sklearn.datasets
+import sklearn.model_selection
+import sklearn.metrics
 
 
 def sigmoid(x):
@@ -94,36 +96,92 @@ def predict(X, y, parameters):
     return p
 
 
-def plot_decision_boundary(model, X, y):
-    x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
-    y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
-    h = 0.01
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-    Z = model(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral)
-    plt.ylabel("x2")
-    plt.xlabel("x1")
-    plt.scatter(X[0, :], X[1, :], c=y, cmap=plt.cm.Spectral)
+def load_dataset(csv_path="../../data/pima-indians-diabetes.csv", test_size=0.2, seed=1):
+    """
+    Bo du lieu Pima Indians Diabetes (768 benh nhan, 8 dac trung lam sang, du doan tieu duong).
+
+    5 cot Glucose/BloodPressure/SkinThickness/Insulin/BMI khong the bang 0 ve mat sinh ly -
+    gia tri 0 o day thuc chat la du lieu bi thieu. Dung median imputation (tinh tren tap train,
+    ap dung lai cho test de tranh data leakage), roi chuan hoa (fit tren train).
+
+    Returns: train_X, train_Y (shape (8, m_train), (1, m_train)), test_X, test_Y (tuong tu voi m_test)
+    """
+    raw = np.genfromtxt(csv_path, delimiter=",", skip_header=1)
+    X = raw[:, :8]
+    y = raw[:, 8]
+
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
+        X, y, test_size=test_size, random_state=seed, stratify=y
+    )
+    X_train = X_train.copy()
+    X_test = X_test.copy()
+
+    zero_as_missing_cols = [1, 2, 3, 4, 5]  # Glucose, BloodPressure, SkinThickness, Insulin, BMI
+    for c in zero_as_missing_cols:
+        col = X_train[:, c]
+        median = np.median(col[col != 0])
+        X_train[X_train[:, c] == 0, c] = median
+        X_test[X_test[:, c] == 0, c] = median
+
+    mu = X_train.mean(axis=0)
+    sigma = X_train.std(axis=0)
+    X_train = (X_train - mu) / sigma
+    X_test = (X_test - mu) / sigma
+
+    train_X, test_X = X_train.T, X_test.T
+    train_Y = y_train.reshape(1, -1)
+    test_Y = y_test.reshape(1, -1)
+    return train_X, train_Y, test_X, test_Y
+
+
+def evaluate_classification(X, y, parameters, title):
+    """
+    Du doan tren (X, y) bang mo hinh da train, in Accuracy/Precision/Recall/F1 va ve
+    confusion matrix + ROC curve. Thay cho decision boundary 2D (khong con ve duoc
+    truc tiep voi du lieu nhieu hon 2 chieu nhu Pima Diabetes).
+    """
+    a3, _ = forward_propagation(X, parameters)
+    y_true = y.ravel().astype(int)
+    y_prob = a3.ravel()
+    y_pred = (y_prob > 0.5).astype(int)
+
+    acc = (y_pred == y_true).mean()
+    prec = sklearn.metrics.precision_score(y_true, y_pred, zero_division=0)
+    rec = sklearn.metrics.recall_score(y_true, y_pred, zero_division=0)
+    f1 = sklearn.metrics.f1_score(y_true, y_pred, zero_division=0)
+    cm = sklearn.metrics.confusion_matrix(y_true, y_pred)
+
+    print(title)
+    print(f"  Accuracy:  {acc:.4f}")
+    print(f"  Precision: {prec:.4f}")
+    print(f"  Recall:    {rec:.4f}  (ty le phat hien dung ca mac benh - quan trong trong bai toan y te)")
+    print(f"  F1-score:  {f1:.4f}")
+
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+
+    axes[0].imshow(cm, cmap="Blues")
+    for i in range(2):
+        for j in range(2):
+            axes[0].text(j, i, str(cm[i, j]), ha="center", va="center",
+                         color="white" if cm[i, j] > cm.max() / 2 else "black", fontsize=14)
+    axes[0].set_xticks([0, 1])
+    axes[0].set_xticklabels(["No Diabetes", "Diabetes"])
+    axes[0].set_yticks([0, 1])
+    axes[0].set_yticklabels(["No Diabetes", "Diabetes"])
+    axes[0].set_xlabel("Du doan")
+    axes[0].set_ylabel("Thuc te")
+    axes[0].set_title("Confusion Matrix\n" + title)
+
+    fpr, tpr, _ = sklearn.metrics.roc_curve(y_true, y_prob)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    axes[1].plot(fpr, tpr, label=f"AUC = {roc_auc:.3f}")
+    axes[1].plot([0, 1], [0, 1], "k--", alpha=0.3)
+    axes[1].set_xlabel("False Positive Rate")
+    axes[1].set_ylabel("True Positive Rate")
+    axes[1].set_title("ROC Curve\n" + title)
+    axes[1].legend()
+
+    plt.tight_layout()
     plt.show()
 
-
-def predict_dec(parameters, X):
-    """Du doan nhi phan (nguong 0.5) dung cho ve decision boundary."""
-    a3, _ = forward_propagation(X, parameters)
-    predictions = a3 > 0.5
-    return predictions
-
-
-def load_dataset():
-    """Bo du lieu 'circles' 2 lop (xanh/do)."""
-    np.random.seed(1)
-    train_X, train_Y = sklearn.datasets.make_circles(n_samples=300, noise=0.05)
-    np.random.seed(2)
-    test_X, test_Y = sklearn.datasets.make_circles(n_samples=100, noise=0.05)
-    plt.scatter(train_X[:, 0], train_X[:, 1], c=train_Y, s=40, cmap=plt.cm.Spectral)
-    train_X = train_X.T
-    train_Y = train_Y.reshape((1, train_Y.shape[0]))
-    test_X = test_X.T
-    test_Y = test_Y.reshape((1, test_Y.shape[0]))
-    return train_X, train_Y, test_X, test_Y
+    return {"accuracy": acc, "precision": prec, "recall": rec, "f1": f1, "auc": roc_auc}

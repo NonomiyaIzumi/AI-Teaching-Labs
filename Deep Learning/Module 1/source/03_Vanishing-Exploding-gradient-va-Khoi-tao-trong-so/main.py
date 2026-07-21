@@ -13,30 +13,20 @@ from model import (
     model,
     model_with_grad_tracking,
 )
-from utils import load_dataset, plot_decision_boundary, predict, predict_dec
+from utils import evaluate_classification, load_dataset, predict
 
 
-def train_and_show(train_X, train_Y, test_X, test_Y, initialization, title, print_predictions=False):
+def train_and_show(train_X, train_Y, test_X, test_Y, initialization, title):
     parameters = model(train_X, train_Y, initialization=initialization)
     print("On the train set:")
-    predictions_train = predict(train_X, train_Y, parameters)
+    predict(train_X, train_Y, parameters)
     print("On the test set:")
-    predictions_test = predict(test_X, test_Y, parameters)
-
-    if print_predictions:
-        print("predictions_train = " + str(predictions_train))
-        print("predictions_test = " + str(predictions_test))
-
-    plt.title(title)
-    axes = plt.gca()
-    axes.set_xlim([-1.5, 1.5])
-    axes.set_ylim([-1.5, 1.5])
-    plot_decision_boundary(lambda x: predict_dec(parameters, x.T), train_X, train_Y)
+    predict(test_X, test_Y, parameters)
+    evaluate_classification(test_X, test_Y, parameters, title + " (test set)")
 
 
 def main():
     train_X, train_Y, test_X, test_Y = load_dataset()
-    plt.show()
 
     print("=== Exercise 1: initialize_parameters_zeros (sanity check) ===")
     parameters = initialize_parameters_zeros([3, 2, 1])
@@ -46,7 +36,7 @@ def main():
     print("b2 = " + str(parameters["b2"]))
 
     print("\n--- Train voi initialization = 'zeros' ---")
-    train_and_show(train_X, train_Y, test_X, test_Y, "zeros", "Model with Zeros initialization", print_predictions=True)
+    train_and_show(train_X, train_Y, test_X, test_Y, "zeros", "Model with Zeros initialization")
 
     print("\n=== Exercise 2: initialize_parameters_random (sanity check) ===")
     parameters = initialize_parameters_random([3, 2, 1])
@@ -56,9 +46,7 @@ def main():
     print("b2 = " + str(parameters["b2"]))
 
     print("\n--- Train voi initialization = 'random' ---")
-    train_and_show(
-        train_X, train_Y, test_X, test_Y, "random", "Model with large random initialization", print_predictions=True
-    )
+    train_and_show(train_X, train_Y, test_X, test_Y, "random", "Model with large random initialization")
 
     print("\n=== Exercise 3: initialize_parameters_he (sanity check) ===")
     parameters = initialize_parameters_he([2, 4, 1])

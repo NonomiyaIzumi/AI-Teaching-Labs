@@ -70,21 +70,37 @@ Không dùng dataset thật. Input là các test case cố định:
 - Phần N-D trước khi sửa: `difference ≈ 0.285` (fail rõ ràng).
 - Phần N-D sau khi sửa: `difference` giảm mạnh, đạt ngưỡng "đúng" (`< 1e-7`).
 
-## 7. Bài tập mở rộng
+## 7. [Bonus] Gradient checking trên dữ liệu thật
+
+Notebook có thêm mục **"6. [Bonus] Gradient checking trên dữ liệu thật"** ở cuối — thay vì chỉ dùng test case cố định của `testCases.py`, mục này lấy mẫu 16 điểm dữ liệu thật từ bộ **Pima Indians Diabetes** (qua `load_dataset()`, cùng bộ dữ liệu dùng ở bài 01 và các bài 03–05), khởi tạo một mạng `[8, 5, 3, 1]` (hệ số nhân `*0.1`), rồi chạy đúng `forward_propagation_n` / `backward_propagation_n` / `gradient_check_n` đã cài ở Exercise 4 lên mạng này.
+
+| Thành phần | Giá trị |
+|---|---|
+| Mini-batch | 16 điểm, lấy mẫu ngẫu nhiên (`np.random.seed(1)`) từ tập train |
+| Kiến trúc | `[8, 5, 3, 1]`, hệ số khởi tạo `*0.1` |
+| Kết quả | `difference ≈ 0.0633` — vẫn phát hiện đúng 2 bug cố ý trong `backward_propagation_n` (giống kết quả ở phần chính, chỉ khác giá trị số vì dữ liệu/kiến trúc khác) |
+
+Điểm cần rút ra: gradient checking là kỹ thuật **tổng quát**, không phụ thuộc vào việc dữ liệu là test case giả lập hay dữ liệu thật, và không phụ thuộc kiến trúc cụ thể — miễn hàm forward khả vi và có thể làm phẳng tham số thành vector.
+
+> **Lưu ý kỹ thuật:** để mục Bonus chạy được với kiến trúc `[8, 5, 3, 1]` (khác `[3, 5, 3, 1]` gốc), `dictionary_to_vector`/`vector_to_dictionary` trong `gc_utils.py` đã được tổng quát hoá để tự suy ra shape từ `parameters.keys()` thay vì hardcode theo kiến trúc 3 lớp cố định — không ảnh hưởng tới kết quả phần bài tập chính (vẫn cho `difference` giống hệt như trước).
+
+## 8. Bài tập mở rộng
 
 1. **Áp dụng lại cho bài 01:** dùng `numerical_gradient`-style ở bài này để tự viết một gradient check cho `linear_backward` đã cài ở bài 01 (mạng 2 lớp) — kết quả có khớp không?
 2. **Thử đổi `epsilon`:** chạy `gradient_check` với `epsilon = 1e-3` và `epsilon = 1e-10`, so sánh relative error — quan sát đánh đổi giữa sai số xấp xỉ (epsilon lớn) và sai số làm tròn số học (epsilon quá nhỏ).
 3. **Đo thời gian chạy:** dùng `%timeit` đo thời gian `gradient_check_n` trên mạng 3 lớp — giải thích bằng số tại sao gradient checking "chậm" và không dùng được trong vòng lặp train mỗi iteration.
+4. **Sửa bug rồi gradient-check lại trên dữ liệu thật:** sau khi sửa 2 dòng sai ở Exercise 4, chạy lại mục Bonus (mạng `[8, 5, 3, 1]` trên Pima) và xác nhận `difference` cũng giảm mạnh giống phần test case cố định.
 
-## 8. Tài liệu bổ sung
+## 9. Tài liệu bổ sung
 
 | Chủ đề | Liên kết tham khảo |
 |---|---|
 | Numerical differentiation | https://en.wikipedia.org/wiki/Numerical_differentiation |
 | Gradient checking (CS231n notes) | https://cs231n.github.io/neural-networks-3/#gradcheck |
+| Pima Indians Diabetes Dataset (nguồn gốc) | https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database |
 
-## 9. Lưu ý khi kiểm tra bài trước khi nộp
+## 10. Lưu ý khi kiểm tra bài trước khi nộp
 
 - Chạy lại toàn bộ notebook từ đầu trên Colab (Restart and run all).
-- Dữ liệu chỉ là giá trị số cố định từ `testCases.py`, không có dữ liệu thật → không có rủi ro data leakage.
+- Dữ liệu chính chỉ là giá trị số cố định từ `testCases.py`, không có dữ liệu thật → không có rủi ro data leakage. Riêng mục Bonus (mục 7) lấy mẫu từ dữ liệu Pima Diabetes thật, chỉ lấy từ tập train nên không rò rỉ dữ liệu test.
 - Sau khi chạy sạch không lỗi, báo lại cho anh Cường / thầy Thiện theo đúng quy trình đã hướng dẫn.

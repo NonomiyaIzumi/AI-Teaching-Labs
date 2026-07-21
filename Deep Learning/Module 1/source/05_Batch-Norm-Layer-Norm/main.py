@@ -10,11 +10,11 @@ import numpy as np
 from model import (
     batchnorm_backward,
     batchnorm_forward,
+    evaluate_classification,
     layernorm_backward,
     layernorm_forward,
     model,
     numerical_gradient,
-    predict_dec,
     relative_error,
 )
 from utils import load_dataset
@@ -85,8 +85,8 @@ def main():
     check_layernorm_gradient()
 
     print("\n=== Debug thuc te: mang sau (4 hidden layer) voi khoi tao kem ===")
-    train_X, train_Y = load_dataset()
-    layers_dims = [2, 20, 20, 20, 20, 1]
+    train_X, train_Y, test_X, test_Y = load_dataset()
+    layers_dims = [train_X.shape[0], 20, 20, 20, 20, 1]
 
     histories = {}
     for norm_type in ["none", "batchnorm", "layernorm"]:
@@ -127,21 +127,37 @@ def main():
     plt.grid(alpha=0.3)
     plt.show()
 
-    print("--- Decision boundary: none vs batchnorm vs layernorm ---")
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
-    x_min, x_max = train_X[0, :].min() - 1, train_X[0, :].max() + 1
-    y_min, y_max = train_X[1, :].min() - 1, train_X[1, :].max() + 1
-    h = 0.02
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-    grid = np.c_[xx.ravel(), yy.ravel()].T
-
-    for ax, norm_type in zip(axes, ["none", "batchnorm", "layernorm"]):
+    print("--- Confusion matrix + ROC (test set): none vs batchnorm vs layernorm ---")
+    results = {}
+    for norm_type in ["none", "batchnorm", "layernorm"]:
         h_ = histories[norm_type]
-        Z = predict_dec(grid, h_["parameters"], layers_dims, norm_type, h_["bn_states"])
-        Z = Z.reshape(xx.shape)
-        ax.contourf(xx, yy, Z, cmap=plt.cm.Spectral, alpha=0.8)
-        ax.scatter(train_X[0, :], train_X[1, :], c=train_Y, cmap=plt.cm.Spectral, edgecolors="k", s=15)
-        ax.set_title(f'norm_type = "{norm_type}"  (cost={h_["costs"][-1]:.3f})')
+        results[norm_type] = evaluate_classification(
+            test_X, test_Y, h_["parameters"], layers_dims, norm_type, h_["bn_states"], f'norm_type = "{norm_type}"'
+        )
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8.5))
+    for col, norm_type in enumerate(["none", "batchnorm", "layernorm"]):
+        r = results[norm_type]
+        cm = r["cm"]
+        ax = axes[0, col]
+        ax.imshow(cm, cmap="Blues")
+        for i in range(2):
+            for j in range(2):
+                ax.text(j, i, str(cm[i, j]), ha="center", va="center",
+                         color="white" if cm[i, j] > cm.max() / 2 else "black", fontsize=13)
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["No Diabetes", "Diabetes"])
+        ax.set_yticks([0, 1])
+        ax.set_yticklabels(["No Diabetes", "Diabetes"])
+        ax.set_title(f'Confusion Matrix\nnorm_type = "{norm_type}" (acc={r["accuracy"]:.3f})')
+
+        ax2 = axes[1, col]
+        ax2.plot(r["fpr"], r["tpr"], label=f'AUC = {r["auc"]:.3f}')
+        ax2.plot([0, 1], [0, 1], "k--", alpha=0.3)
+        ax2.set_xlabel("False Positive Rate")
+        ax2.set_ylabel("True Positive Rate")
+        ax2.set_title(f'ROC Curve - norm_type = "{norm_type}"')
+        ax2.legend()
     plt.tight_layout()
     plt.show()
 

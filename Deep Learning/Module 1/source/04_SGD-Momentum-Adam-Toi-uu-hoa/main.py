@@ -3,8 +3,6 @@ Chay tuan tu bai 04: 8 exercise ve toi uu hoa (GD/Momentum/Adam/LR decay) +
 7 lan train mo hinh 3 lop de so sanh cac optimizer. Tuong duong chay het notebook tu tren xuong.
 """
 
-import matplotlib.pyplot as plt
-
 from model import (
     initialize_adam,
     initialize_velocity,
@@ -24,23 +22,21 @@ from test_cases import (
     update_parameters_with_gd_test_case,
     update_parameters_with_momentum_test_case,
 )
-from utils import load_dataset, plot_decision_boundary, predict, predict_dec
+from utils import evaluate_classification, load_dataset, predict
 
 
-def train_and_show(train_X, train_Y, layers_dims, title, **model_kwargs):
+def train_and_show(train_X, train_Y, test_X, test_Y, layers_dims, title, **model_kwargs):
     parameters = model(train_X, train_Y, layers_dims, **model_kwargs)
-    predictions = predict(train_X, train_Y, parameters)
-    plt.title(title)
-    axes = plt.gca()
-    axes.set_xlim([-1.5, 2.5])
-    axes.set_ylim([-1, 1.5])
-    plot_decision_boundary(lambda x: predict_dec(parameters, x.T), train_X, train_Y)
-    return parameters, predictions
+    print("On the train set:")
+    predict(train_X, train_Y, parameters)
+    print("On the test set:")
+    predict(test_X, test_Y, parameters)
+    metrics = evaluate_classification(test_X, test_Y, parameters, title + " (test set)")
+    return parameters, metrics
 
 
 def main():
-    train_X, train_Y = load_dataset()
-    plt.show()
+    train_X, train_Y, test_X, test_Y = load_dataset()
     layers_dims = [train_X.shape[0], 5, 2, 1]
 
     print("=== Exercise 1: update_parameters_with_gd ===")
@@ -105,11 +101,11 @@ def main():
     print(f"b2 = \n{parameters['b2']}")
 
     print("\n--- Train 3-layer model: so sanh gd / momentum / adam (khong decay) ---")
-    train_and_show(train_X, train_Y, layers_dims, "Model with Gradient Descent optimization", optimizer="gd")
+    train_and_show(train_X, train_Y, test_X, test_Y, layers_dims, "Model with Gradient Descent optimization", optimizer="gd")
     train_and_show(
-        train_X, train_Y, layers_dims, "Model with Momentum optimization", optimizer="momentum", beta=0.9
+        train_X, train_Y, test_X, test_Y, layers_dims, "Model with Momentum optimization", optimizer="momentum", beta=0.9
     )
-    train_and_show(train_X, train_Y, layers_dims, "Model with Adam optimization", optimizer="adam")
+    train_and_show(train_X, train_Y, test_X, test_Y, layers_dims, "Model with Adam optimization", optimizer="adam")
 
     print("\n=== Exercise 7: update_lr ===")
     learning_rate = 0.5
@@ -121,7 +117,7 @@ def main():
 
     print("\n--- Train voi optimizer='gd', decay=update_lr ---")
     train_and_show(
-        train_X, train_Y, layers_dims, "Model with Gradient Descent optimization",
+        train_X, train_Y, test_X, test_Y, layers_dims, "Model with Gradient Descent optimization",
         optimizer="gd", learning_rate=0.1, num_epochs=5000, decay=update_lr,
     )
 
@@ -138,15 +134,15 @@ def main():
 
     print("\n--- Train voi schedule_lr_decay: gd / momentum / adam ---")
     train_and_show(
-        train_X, train_Y, layers_dims, "Model with Gradient Descent optimization",
+        train_X, train_Y, test_X, test_Y, layers_dims, "Model with Gradient Descent optimization",
         optimizer="gd", learning_rate=0.1, num_epochs=5000, decay=schedule_lr_decay,
     )
     train_and_show(
-        train_X, train_Y, layers_dims, "Model with Gradient Descent with momentum optimization",
+        train_X, train_Y, test_X, test_Y, layers_dims, "Model with Gradient Descent with momentum optimization",
         optimizer="momentum", learning_rate=0.1, num_epochs=5000, decay=schedule_lr_decay,
     )
     train_and_show(
-        train_X, train_Y, layers_dims, "Model with Adam optimization",
+        train_X, train_Y, test_X, test_Y, layers_dims, "Model with Adam optimization",
         optimizer="adam", learning_rate=0.01, num_epochs=5000, decay=schedule_lr_decay,
     )
 
