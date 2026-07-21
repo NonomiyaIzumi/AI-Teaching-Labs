@@ -4,6 +4,8 @@
 
 **Notebook tương ứng:** `thực hành/03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so/03_Khoi_tao_trong_so.ipynb`
 
+**Chạy bản project (local, không cần Jupyter):** `source/03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so && uv run --project .. python main.py`.
+
 ## 1. Phát biểu bài toán
 
 Huấn luyện cùng một mạng 3 lớp trên cùng một dataset, chỉ thay đổi **cách khởi tạo trọng số**, để quan sát trực tiếp hậu quả của vanishing/exploding gradient và cách He initialization khắc phục vấn đề này.

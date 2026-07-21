@@ -4,6 +4,8 @@
 
 **Notebook tương ứng:** `thực hành/01_Kien-truc-DNN-va-Backpropagation/01_Xay_dung_mo_hinh_DNN.ipynb`
 
+**Chạy bản project (local, không cần Jupyter):** `source/01_Kien-truc-DNN-va-Backpropagation/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 01_Kien-truc-DNN-va-Backpropagation && uv run --project .. python main.py`.
+
 ## 1. Phát biểu bài toán
 
 Cài đặt từ đầu (chỉ dùng NumPy, không dùng framework) toàn bộ các khối xây dựng của một mạng DNN L lớp: khởi tạo tham số, forward propagation, hàm mất mát, backward propagation và cập nhật tham số — để dùng làm nền tảng cho mọi bài sau trong Module 1.

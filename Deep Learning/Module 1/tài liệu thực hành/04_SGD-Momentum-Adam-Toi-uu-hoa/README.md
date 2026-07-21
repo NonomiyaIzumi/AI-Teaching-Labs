@@ -4,6 +4,8 @@
 
 **Notebook tương ứng:** `thực hành/04_SGD-Momentum-Adam-Toi-uu-hoa/04_Toi_uu_hoa.ipynb`
 
+**Chạy bản project (local, không cần Jupyter):** `source/04_SGD-Momentum-Adam-Toi-uu-hoa/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 04_SGD-Momentum-Adam-Toi-uu-hoa && uv run --project .. python main.py`.
+
 ## 1. Phát biểu bài toán
 
 Cài đặt và so sánh 3 thuật toán cập nhật trọng số (Gradient Descent thuần, Momentum, Adam) trên cùng một kiến trúc mạng và cùng dataset, cộng thêm kỹ thuật learning rate decay, để thấy rõ tốc độ/độ ổn định hội tụ khác nhau giữa các optimizer.

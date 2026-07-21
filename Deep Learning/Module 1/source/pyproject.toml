@@ -1,0 +1,21 @@
+[project]
+name = "dl-module1-labs"
+version = "0.1.0"
+description = "Ban project-style (chay local) cho 5 bai thuc hanh Module 1 - Deep Learning"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "scikit-learn>=1.4",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+# E741 (ten bien "l"): giu nguyen vi khop ky hieu toan hoc W^[l]/b^[l] dung xuyen suot
+# cac notebook va tai lieu huong dan cap doi (layer index).
+# E722/E721 (bare except / type comparison): chi xuat hien trong test_utils.py va
+# 02.../main.py, la code copy nguyen tra tu ban notebook goc (Coursera) de giu dung
+# hanh vi cham diem/assert ban dau, khong phai code tu viet.
+ignore = ["E741", "E722", "E721"]

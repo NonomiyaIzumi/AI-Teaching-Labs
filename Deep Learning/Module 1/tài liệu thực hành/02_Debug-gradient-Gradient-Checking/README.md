@@ -4,6 +4,8 @@
 
 **Notebook tương ứng:** `thực hành/02_Debug-gradient-Gradient-Checking/02_Kiem_tra_gradient.ipynb`
 
+**Chạy bản project (local, không cần Jupyter):** `source/02_Debug-gradient-Gradient-Checking/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 02_Debug-gradient-Gradient-Checking && uv run --project .. python main.py`.
+
 ## 1. Phát biểu bài toán
 
 Xây dựng công cụ **debug backward propagation**: so sánh gradient tính bằng đạo hàm giải tích (backprop tự cài) với gradient ước lượng bằng sai phân hữu hạn (numerical gradient), để phát hiện lỗi trong code backward *trước khi* dùng nó huấn luyện một mạng thật.

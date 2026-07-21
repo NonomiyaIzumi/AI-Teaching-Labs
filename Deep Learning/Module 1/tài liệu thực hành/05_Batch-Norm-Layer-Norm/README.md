@@ -4,6 +4,8 @@
 
 **Notebook tương ứng:** `thực hành/05_Batch-Norm-Layer-Norm/05_Batch_Norm_Layer_Norm.ipynb`
 
+**Chạy bản project (local, không cần Jupyter):** `source/05_Batch-Norm-Layer-Norm/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 05_Batch-Norm-Layer-Norm && uv run --project .. python main.py`.
+
 > Notebook này do tự biên soạn (không có sẵn trong bộ bài tập gốc của Coursera) để lấp đầy nội dung *Batch Normalization, Layer Normalization* trong đề cương Chương 1. Toàn bộ code đã được **gradient-check bằng numerical gradient** (kỹ thuật học ở bài 02) trước khi đưa vào bài, sai số ~1e-9.
 
 ## 1. Phát biểu bài toán
