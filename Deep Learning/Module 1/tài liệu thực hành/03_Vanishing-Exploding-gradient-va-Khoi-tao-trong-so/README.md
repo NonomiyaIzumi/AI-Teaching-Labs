@@ -6,6 +6,8 @@
 
 **Chạy bản project (local, không cần Jupyter):** `source/03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so && uv run --project .. python main.py`.
 
+**Cách làm bài trong notebook:** Mỗi hàm `# GRADED FUNCTION` đã được để trống (`pass`) ở đoạn `# YOUR CODE STARTS HERE ... # YOUR CODE ENDS HERE` — bạn tự viết code vào đó. Ngay bên dưới mỗi bài là 1 cell **💡 Đáp án** dạng form thu gọn của Colab (bấm mũi tên bên trái hoặc chọn "Show code" ở menu ba chấm để mở ra xem). Vì cell đáp án vẫn tự chạy khi bạn bấm "Runtime → Run all", notebook sẽ **không bao giờ báo lỗi** dù bạn chưa làm bài nào — nhưng lưu ý: chạy Run all như vậy nghĩa là bạn đang xem code của đáp án, không phải code bạn viết. Để tự kiểm tra bài của mình, sau khi viết code vào cell bài tập, hãy **chạy lại đúng cell đó** (không chạy cell đáp án ngay dưới) rồi mới chạy tiếp các cell demo/test phía sau — vì Python luôn dùng định nghĩa hàm được chạy **gần nhất**.
+
 ## 1. Phát biểu bài toán
 
 Huấn luyện cùng một mạng 3 lớp trên cùng một dataset, chỉ thay đổi **cách khởi tạo trọng số**, để quan sát trực tiếp hậu quả của vanishing/exploding gradient và cách He initialization khắc phục vấn đề này.

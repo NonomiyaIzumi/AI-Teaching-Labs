@@ -6,6 +6,8 @@
 
 **Chạy bản project (local, không cần Jupyter):** `source/05_Batch-Norm-Layer-Norm/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 05_Batch-Norm-Layer-Norm && uv run --project .. python main.py`.
 
+**Cách làm bài trong notebook:** Khác với 4 notebook trước (vốn đã có sẵn cấu trúc bài tập), notebook này ban đầu là code hoàn chỉnh — nay đã để trống riêng 2 hàm `batchnorm_backward` và `layernorm_backward` (đúng gợi ý "biến thành bài tập" ghi trong chính notebook) theo cùng cơ chế với 4 bài kia: `# YOUR CODE STARTS HERE ... # YOUR CODE ENDS HERE` để trống (`pass`), ngay dưới có cell **💡 Đáp án** dạng form thu gọn của Colab. Cell đáp án vẫn tự chạy khi bấm "Runtime → Run all" nên notebook không bao giờ báo lỗi dù chưa làm bài; để tự kiểm tra bài của mình, viết code vào cell bài tập rồi **chạy lại đúng cell đó** (không chạy cell đáp án) trước khi chạy tiếp các cell gradient-check phía sau.
+
 > Notebook này do tự biên soạn (không có sẵn trong bộ bài tập gốc của Coursera) để lấp đầy nội dung *Batch Normalization, Layer Normalization* trong đề cương Chương 1. Toàn bộ code đã được **gradient-check bằng numerical gradient** (kỹ thuật học ở bài 02) trước khi đưa vào bài, sai số ~1e-9.
 
 ## 1. Phát biểu bài toán

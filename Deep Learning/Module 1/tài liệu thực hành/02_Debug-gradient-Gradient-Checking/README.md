@@ -6,6 +6,8 @@
 
 **Chạy bản project (local, không cần Jupyter):** `source/02_Debug-gradient-Gradient-Checking/` — xem hướng dẫn cài đặt/chạy chung tại `source/README.md`. Tóm tắt: `cd "source" && uv sync`, sau đó `cd 02_Debug-gradient-Gradient-Checking && uv run --project .. python main.py`.
 
+**Cách làm bài trong notebook:** Mỗi hàm `# GRADED FUNCTION` đã được để trống (`pass`) ở đoạn `# YOUR CODE STARTS HERE ... # YOUR CODE ENDS HERE` — bạn tự viết code vào đó. Ngay bên dưới mỗi bài là 1 cell **💡 Đáp án** dạng form thu gọn của Colab (bấm mũi tên bên trái hoặc chọn "Show code" ở menu ba chấm để mở ra xem). Vì cell đáp án vẫn tự chạy khi bạn bấm "Runtime → Run all", notebook sẽ **không bao giờ báo lỗi** dù bạn chưa làm bài nào — nhưng lưu ý: chạy Run all như vậy nghĩa là bạn đang xem code của đáp án, không phải code bạn viết. Để tự kiểm tra bài của mình, sau khi viết code vào cell bài tập, hãy **chạy lại đúng cell đó** (không chạy cell đáp án ngay dưới) rồi mới chạy tiếp các cell demo/test phía sau — vì Python luôn dùng định nghĩa hàm được chạy **gần nhất**.
+
 ## 1. Phát biểu bài toán
 
 Xây dựng công cụ **debug backward propagation**: so sánh gradient tính bằng đạo hàm giải tích (backprop tự cài) với gradient ước lượng bằng sai phân hữu hạn (numerical gradient), để phát hiện lỗi trong code backward *trước khi* dùng nó huấn luyện một mạng thật.
