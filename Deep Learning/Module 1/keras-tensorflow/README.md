@@ -12,7 +12,8 @@ Có **2 cách dùng**, chọn 1 tuỳ nhu cầu:
 `Pima_Diabetes_Nen_Tang_Deep_Learning_Keras.ipynb` - **1 file duy nhất**, gồm cả 5 phần theo thứ
 tự: Xây dựng mạng DNN → Gradient Checking/Autodiff → Khởi tạo trọng số → Optimizer → BatchNorm/
 LayerNorm. Không cần clone repo hay cài `keras_utils.py` riêng - notebook tự tải file dữ liệu CSV
-về (1 cell duy nhất, xem mục Cài đặt bên dưới) và chạy độc lập từ đầu đến cuối.
+về (1 cell duy nhất, xem mục Cài đặt bên dưới) và chạy độc lập từ đầu đến cuối. Tài liệu hướng dẫn
+chi tiết: `../tài liệu thực hành/Pima_Diabetes_Nen_Tang_Deep_Learning_Keras/README.md`.
 
 ## Cách 2 - 5 notebook riêng (tiện học/ôn từng chủ đề một)
 
