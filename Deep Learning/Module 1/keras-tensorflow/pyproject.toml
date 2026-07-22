@@ -1,0 +1,21 @@
+[project]
+name = "dl-module1-keras-tensorflow"
+version = "0.1.0"
+description = "Ban minh hoa dung tf.keras (thay the NumPy from-scratch) cho 5 bai thuc hanh Module 1 - Deep Learning"
+requires-python = ">=3.10"
+dependencies = [
+    "tensorflow>=2.16",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "scikit-learn>=1.4",
+]
+
+[dependency-groups]
+dev = [
+    "nbclient>=0.10",
+    "nbformat>=5.10",
+    "ipykernel>=6.29",
+]
+
+[tool.ruff]
+line-length = 120
