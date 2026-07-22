@@ -5,17 +5,18 @@ có 1 bài tập nhỏ (`# YOUR CODE STARTS HERE ... # YOUR CODE ENDS HERE`) và
 form thu gọn ngay bên dưới. Cả 5 chủ đề đều dùng chung một bộ dữ liệu y tế thật: **Pima Indians
 Diabetes** (768 bệnh nhân, 8 đặc trưng lâm sàng, dự đoán tiểu đường).
 
-Có **2 cách dùng**, chọn 1 tuỳ nhu cầu:
+Có **2 lựa chọn**, chọn 1 tuỳ nhu cầu:
 
-## Cách 1 - Notebook gộp (khuyến nghị để học liền mạch)
+## Lựa chọn 1 - `Pima_Diabetes_Nen_Tang_Deep_Learning_Keras.ipynb`
 
-`Pima_Diabetes_Nen_Tang_Deep_Learning_Keras.ipynb` - **1 file duy nhất**, gồm cả 5 phần theo thứ
-tự: Xây dựng mạng DNN → Gradient Checking/Autodiff → Khởi tạo trọng số → Optimizer → BatchNorm/
-LayerNorm. Không cần clone repo hay cài `keras_utils.py` riêng - notebook tự tải file dữ liệu CSV
-về (1 cell duy nhất, xem mục Cài đặt bên dưới) và chạy độc lập từ đầu đến cuối. Tài liệu hướng dẫn
-chi tiết: `../tài liệu thực hành/Pima_Diabetes_Nen_Tang_Deep_Learning_Keras/README.md`.
+**1 file duy nhất**, trình bày 5 phần nối tiếp nhau: Xây dựng mạng DNN → Gradient Checking/Autodiff
+→ Khởi tạo trọng số → Optimizer → BatchNorm/LayerNorm — đi từ kiến trúc mạng cơ bản đến các kỹ
+thuật giúp mạng học ổn định và hiệu quả hơn, phù hợp để học liền mạch trong một buổi. Không cần
+clone repo - notebook tự tải file dữ liệu CSV về (1 cell duy nhất, xem mục Cài đặt bên dưới) và
+chạy độc lập từ đầu đến cuối. Tài liệu hướng dẫn chi tiết:
+`../tài liệu thực hành/Pima_Diabetes_Nen_Tang_Deep_Learning_Keras/README.md`.
 
-## Cách 2 - 5 notebook riêng (tiện học/ôn từng chủ đề một)
+## Lựa chọn 2 - 5 notebook riêng theo từng chủ đề (tiện học/ôn từng phần một)
 
 | Bài | Notebook | Chủ đề |
 |---|---|---|
@@ -25,10 +26,9 @@ chi tiết: `../tài liệu thực hành/Pima_Diabetes_Nen_Tang_Deep_Learning_Ke
 | 04 | `04_SGD-Momentum-Adam-Toi-uu-hoa/04_Toi_uu_hoa_Keras.ipynb` | Optimizer: GD, Momentum, Adam |
 | 05 | `05_Batch-Norm-Layer-Norm/05_Batch_Norm_Layer_Norm_Keras.ipynb` | `BatchNormalization`, `LayerNormalization` |
 
-Mỗi bài là notebook độc lập, tự tải dữ liệu qua `keras_utils.py` riêng của nó (cùng nội dung
-`load_dataset`/`compile_and_train`/`evaluate_classification` như bản gộp).
+Mỗi bài là notebook độc lập, tự tải dữ liệu qua `keras_utils.py` riêng của nó.
 
-## Cài đặt (chạy 1 lần, cho cả 2 cách)
+## Cài đặt (chạy 1 lần, cho cả 2 lựa chọn)
 
 ```bash
 cd "keras-tensorflow"

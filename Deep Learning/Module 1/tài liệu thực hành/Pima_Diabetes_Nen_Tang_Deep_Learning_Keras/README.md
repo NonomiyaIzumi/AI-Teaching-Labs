@@ -4,15 +4,10 @@
 
 **Notebook tương ứng:** `keras-tensorflow/Pima_Diabetes_Nen_Tang_Deep_Learning_Keras.ipynb`
 
-**Đây là bản gộp** cả 5 chủ đề nền tảng của Module 1 thành **1 file duy nhất**, dùng `tf.keras` và dùng chung một bộ dữ liệu y tế thật (Pima Indians Diabetes) xuyên suốt:
-
-| Phần | Chủ đề | Notebook riêng tương ứng (nếu muốn học tách rời) |
-|---|---|---|
-| 1 | Xây dựng và huấn luyện mạng DNN (`keras.Sequential`, forward/backward/gradient descent) | `keras-tensorflow/01_Kien-truc-DNN-va-Backpropagation/01_Xay_dung_mo_hinh_DNN_Keras.ipynb` |
-| 2 | Tính đạo hàm tự động (`tf.GradientTape`) và Gradient Checking | `keras-tensorflow/02_Debug-gradient-Gradient-Checking/02_Kiem_tra_gradient_Keras.ipynb` |
-| 3 | Khởi tạo trọng số và Vanishing/Exploding Gradient (`kernel_initializer`) | `keras-tensorflow/03_Vanishing-Exploding-gradient-va-Khoi-tao-trong-so/03_Khoi_tao_trong_so_Keras.ipynb` |
-| 4 | Các thuật toán tối ưu hoá: GD, Momentum, Adam | `keras-tensorflow/04_SGD-Momentum-Adam-Toi-uu-hoa/04_Toi_uu_hoa_Keras.ipynb` |
-| 5 | Batch Normalization và Layer Normalization | `keras-tensorflow/05_Batch-Norm-Layer-Norm/05_Batch_Norm_Layer_Norm_Keras.ipynb` |
+Notebook trình bày **5 phần nối tiếp nhau** — Xây dựng mạng DNN → Gradient Checking/Autodiff →
+Khởi tạo trọng số → Optimizer → BatchNorm/LayerNorm — dùng `tf.keras` và xuyên suốt một bộ dữ liệu
+y tế thật (Pima Indians Diabetes), đi từ kiến trúc mạng cơ bản nhất đến các kỹ thuật giúp mạng học
+ổn định và hiệu quả hơn.
 
 **Cài đặt (chạy 1 lần):** `cd "keras-tensorflow" && uv sync`. Chi tiết ở `keras-tensorflow/README.md`.
 
